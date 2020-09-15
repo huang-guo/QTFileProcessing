@@ -1,6 +1,8 @@
 # This is a sample Python script.
-from frame.widget import FileDrop
-
+import os
+import tkinter as tk
+from func import *
+from tkinter.filedialog import askopenfilenames
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -8,6 +10,7 @@ from frame.widget import FileDrop
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    FileDrop()
-
+    root = tk.Tk()
+    layout(root)
+    root.mainloop()
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
