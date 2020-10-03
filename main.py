@@ -1,7 +1,7 @@
 # This is a sample Python script.
 import os
 import tkinter as tk
-from func import *
+from func import layout
 from tkinter.filedialog import askopenfilenames
 
 # Press Shift+F10 to execute it or replace it with your code.

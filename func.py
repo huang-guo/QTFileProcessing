@@ -1,6 +1,6 @@
 import pandas as pd
 import tkinter as tk
-
+import os
 from tkinter.constants import *
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilenames, askopenfilename
@@ -9,6 +9,7 @@ import json
 
 def layout(master: tk.Tk):
     master.geometry('500x500')
+    master.title('前途文体')
 
     def load_data():
 
@@ -28,10 +29,33 @@ def layout(master: tk.Tk):
                         d[a[1]] = [a[4], a[-1], a[-6] + a[-8], eval(a[-5])]
             with open('./commodity.json', 'w', encoding='utf-8') as f2:
                 json.dump(d, f2, ensure_ascii=False, indent=4)
+            messagebox.showinfo('提示', '导入成功')
+
+    def load_link():
+        file_name = askopenfilename(
+            filetypes=[('链接', '.xls')],
+        )
+
+        if file_name:
+            df = get_df(file_name)
+            links = df['链接']
+            names = df['商品全名'] + df['单价'].astype(str)
+            d = dict(zip(names, links))
+            if os.access('./link.json', os.F_OK):
+                print(1)
+                old_links = load_link_json()
+                old_links.update(d)
+                d = old_links
+            with open('./link.json', 'w', encoding='utf-8') as f:
+                json.dump(d, f, ensure_ascii=False, indent=4)
+            messagebox.showinfo('提示', '导入成功')
 
     menu_bar = tk.Menu(master)
     menu_bar.add_command(label="加载数据", command=load_data)
+    menu_bar.add_command(label="加载链接", command=load_link)
+
     master.config(menu=menu_bar)
+
     listbox = tk.Listbox(master, width=100)
     listbox.pack()
 
@@ -39,7 +63,6 @@ def layout(master: tk.Tk):
 
         file_names = askopenfilenames(
             filetypes=[('excel', '.xls')],
-            initialdir="E:/",
         )
         for item in file_names:
             if item not in listbox.get(0, END):
@@ -70,10 +93,35 @@ def layout(master: tk.Tk):
     def invoice():
         generate_excel(listbox.get(0, END))
 
+    def link():
+        add_link(listbox.get(0, END))
+
     summary_btn = tk.Button(label_frame, text="汇总", command=summary)
     summary_btn.pack(side="left")
     invoice_btn = tk.Button(label_frame, text="生成发票清单", command=invoice)
     invoice_btn.pack(side="left")
+    link_btn = tk.Button(label_frame, text="添加链接", command=link)
+    link_btn.pack(side="left")
+
+
+def add_link(files):
+    d = load_link_json()
+    keys = d.keys()
+    for file in files:
+        try:
+            link = []
+            df = get_df(file)
+            names = df['商品全名'] + df['单价'].astype(str)
+            for name in names:
+                if name in keys:
+                    link.append(d[name])
+                else:
+                    link.append(None)
+            df['链接'] = link
+            df.to_excel(file.replace('.xls', '(链接).xls'), index=False)
+            messagebox.showinfo('提示', file + '添加链接成功')
+        except Exception as e:
+            messagebox.showerror(e, file + '添加链接失败')
 
 
 def summary_excel(files):
@@ -89,9 +137,8 @@ def summary_excel(files):
             d.to_excel(file.replace('.', '(汇总).'), encoding='utf-8', index=False)
             messagebox.showinfo('提示', file + '汇总成功')
             result.append(new_file)
-            print(new_file)
-        except:
-            messagebox.showerror('错误', file + '汇总失败')
+        except Exception as e:
+            messagebox.showerror(e, file + '汇总失败')
     return result
 
 
@@ -107,12 +154,15 @@ def generate_excel(files):
             best = None
             for i in range(1, len(serif) + 1):
                 s = serif.loc[i]
+                if s['数量'] < 1:
+                    continue
                 w = s['商品全名']
                 length = 0
                 for word in d.keys():
                     if word in w:
                         if word == w:
                             best = word
+                            length = 1
                             break
                         elif len(word) > length:
                             length = len(word)
@@ -130,12 +180,12 @@ def generate_excel(files):
                     err.append(i)
             new_serif = serif.loc[err]
             err_df = pd.DataFrame(new_serif, )
-            err_df.to_excel(file.replace('.', '(无).'), encoding='utf-8', index=False)
-            df.to_excel(file.replace('.', '(发票).'), encoding='utf-8', index=False)
-            messagebox.showinfo('提示', file + '发票清单成功')
-        except:
+            err_df.to_excel(file.replace('.xls', '(无).xls'), encoding='utf-8', index=False)
+            df.to_excel(file.replace('.xls', '(发票).xls'), encoding='utf-8', index=False)
+            messagebox.showinfo('提示', file + '  发票清单成功')
+        except Exception as e:
 
-            messagebox.showerror('错误', file + '发票清单错误')
+            messagebox.showerror(e, file + '  发票清单错误')
 
 
 def get_s(num, price, t):
@@ -145,7 +195,15 @@ def get_s(num, price, t):
     return round(((num * price) * t) / (1 + t), 2)
 
 
+def load_link_json():
+    with open('./link.json', encoding='utf-8')as f:
+        d = json.load(f)
+    return d
+
+
 def get_df(file):
     df = pd.read_excel(file, header=None).dropna()
     df.columns = df.iloc[0]
-    return df[df['商品全名'] != '商品全名']
+    df = df[df['商品全名'] != '商品全名']
+    df.index = range(1, len(df) + 1)
+    return df
