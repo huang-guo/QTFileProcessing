@@ -38,7 +38,6 @@ def load_link():
         names = df[FIELD_COMMODITY] + df[FIELD_PRICE].astype(str)
         d = dict(zip(names, links))
         if os.access('./link.json', os.F_OK):
-            print(1)
             old_links = load_link_json()
             old_links.update(d)
             d = old_links
@@ -48,14 +47,12 @@ def load_link():
 
 
 def summary(files):
-    print(files)
     result = []
     for file in files:
         try:
             serif = get_df(file)
             s = serif.groupby([FIELD_COMMODITY, FIELD_UNIT, FIELD_PRICE], as_index=False)[FIELD_NUM].sum()
             d = pd.DataFrame(s)
-            print(1)
             d[FIELD_MONEY] = d[FIELD_NUM] * d[FIELD_PRICE]
             d.insert(0, FIELD_NUMBER, range(1, len(d) + 1), )
             new_file = file.replace('.', '(汇总).')
@@ -143,7 +140,10 @@ def get_s(num, price, t):
 
 def load_link_json():
     with open(LINK_JS, encoding='utf-8')as f:
-        d = json.load(f)
+        content = f.read()
+    if content.startswith(u'\ufeff'):
+        content = content.encode('utf8')[3:].decode('utf8')
+    d = json.loads(content)
     return d
 
 
