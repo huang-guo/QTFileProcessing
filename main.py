@@ -11,4 +11,3 @@ if __name__ == '__main__':
     root = tk.Tk()
     layout(root)
     root.mainloop()
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

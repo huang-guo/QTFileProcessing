@@ -1,15 +1,19 @@
-COMMODITY_CODE_JS = './commodity.json'
-LINK_JS = './link.json'
+import json
 
-SAMPLE_INVOICE = '增值税发票税控开票软件清单信息数据接口规范样例.xls'
+with open('config.json', encoding='utf-8')as f:
+    config = json.load(f)
 
-FIELD_LINK = '链接'
-FIELD_COMMODITY = '商品全名'
-FIELD_PRICE = '单价'
-FIELD_UNIT = '单位'
-FIELD_NUM = '数量'
-FIELD_MONEY = '金额'
-FIELD_NUMBER = '序号'
+COMMODITY_CODE_JS = config['commodity_code_js']
+LINK_JS = config["link_js"]
 
-EXCEL_SUFFIX = ['.xls']
+SAMPLE_INVOICE = config['sample_invoice']
 
+FIELD_LINK = config['field_link']
+FIELD_COMMODITY = config["field_commodity"]
+FIELD_PRICE = config["field_price"]
+FIELD_UNIT = config["field_unit"]
+FIELD_NUM = config["field_num"]
+FIELD_MONEY = config["field_money"]
+FIELD_NUMBER = config["field_number"]
+
+EXCEL_SUFFIX = config["excel_suffix"]

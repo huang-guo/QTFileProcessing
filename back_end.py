@@ -1,4 +1,3 @@
-import json
 import os
 import pandas as pd
 
@@ -11,19 +10,19 @@ def load_data():
     file_name = askopenfilename(
         filetypes=[('文本', '.txt')],
     )
-    d = {}
+    commodity = {}
     if file_name:
-        with open(file_name)as f:
-            for line in f.readlines()[3:]:
+        with open(file_name)as file:
+            for line in file.readlines()[3:]:
                 line = line.replace('\n', '')
                 line = line.replace('否', '0').replace('是', '1')
                 a = line.split(',')
                 if len(a[-6] + a[-8]) != 19:
                     continue
                 else:
-                    d[a[1]] = [a[4], a[-1], a[-6] + a[-8], eval(a[-5])]
+                    commodity[a[1]] = [a[4], a[-1], a[-6] + a[-8], eval(a[-5])]
         with open(COMMODITY_CODE_JS, 'w', encoding='utf-8') as f2:
-            json.dump(d, f2, ensure_ascii=False, indent=4)
+            json.dump(commodity, f2, ensure_ascii=False, indent=4)
         messagebox.showinfo('提示', '导入成功')
 
 
@@ -36,13 +35,13 @@ def load_link():
         df = get_df(file_name)
         links = df[FIELD_LINK]
         names = df[FIELD_COMMODITY] + df[FIELD_PRICE].astype(str)
-        d = dict(zip(names, links))
+        names_d = dict(zip(names, links))
         if os.access('./link.json', os.F_OK):
             old_links = load_link_json()
-            old_links.update(d)
-            d = old_links
-        with open(LINK_JS, 'w', encoding='utf-8') as f:
-            json.dump(d, f, ensure_ascii=False, indent=4)
+            old_links.update(names_d)
+            names_d = old_links
+        with open(LINK_JS, 'w', encoding='utf-8') as file:
+            json.dump(names_d, file, ensure_ascii=False, indent=4)
         messagebox.showinfo('提示', '导入成功')
 
 
@@ -52,11 +51,11 @@ def summary(files):
         try:
             serif = get_df(file)
             s = serif.groupby([FIELD_COMMODITY, FIELD_UNIT, FIELD_PRICE], as_index=False)[FIELD_NUM].sum()
-            d = pd.DataFrame(s)
-            d[FIELD_MONEY] = d[FIELD_NUM] * d[FIELD_PRICE]
-            d.insert(0, FIELD_NUMBER, range(1, len(d) + 1), )
+            df = pd.DataFrame(s)
+            df[FIELD_MONEY] = df[FIELD_NUM] * df[FIELD_PRICE]
+            df.insert(0, FIELD_NUMBER, range(1, len(df) + 1), )
             new_file = file.replace('.', '(汇总).')
-            d.to_excel(file.replace('.', '(汇总).'), encoding='utf-8', index=False)
+            df.to_excel(file.replace('.', '(汇总).'), encoding='utf-8', index=False)
             messagebox.showinfo('汇总成功', file)
             result.append(new_file)
         except Exception as e:
@@ -65,8 +64,8 @@ def summary(files):
 
 
 def add_link(files):
-    d = load_link_json()
-    keys = d.keys()
+    links = load_link_json()
+    keys = links.keys()
     for file in files:
         try:
             link = []
@@ -74,7 +73,7 @@ def add_link(files):
             names = df[FIELD_COMMODITY] + df[FIELD_PRICE].astype(str)
             for name in names:
                 if name in keys:
-                    link.append(d[name])
+                    link.append(links[name])
                 else:
                     link.append(None)
             df[FIELD_LINK] = link
@@ -85,8 +84,8 @@ def add_link(files):
 
 
 def invoice(files):
-    with open(COMMODITY_CODE_JS, encoding='utf-8')as f:
-        d = json.load(f)
+    with open(COMMODITY_CODE_JS, encoding='utf-8')as f1:
+        d = json.load(f1)
     for file in files:
         try:
             k = 1
@@ -139,8 +138,8 @@ def get_s(num, price, t):
 
 
 def load_link_json():
-    with open(LINK_JS, encoding='utf-8')as f:
-        content = f.read()
+    with open(LINK_JS, encoding='utf-8')as file:
+        content = file.read()
     if content.startswith(u'\ufeff'):
         content = content.encode('utf8')[3:].decode('utf8')
     d = json.loads(content)

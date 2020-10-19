@@ -1,3 +1,7 @@
-*.json
 /dist/
 /build/
+/venv/
+commodity.json
+link.json
+*.spec
+*.exe
