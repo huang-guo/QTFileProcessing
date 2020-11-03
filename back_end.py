@@ -17,13 +17,12 @@ def load_data():
                 line = line.replace('\n', '')
                 line = line.replace('否', '0').replace('是', '1')
                 a = line.split(',')
-                if len(a[-6] + a[-8]) != 19:
-                    continue
-                else:
-                    commodity[a[1]] = [a[4], a[-1], a[-6] + a[-8], eval(a[-5])]
-        with open(COMMODITY_CODE_JS, 'w', encoding='utf-8') as f2:
-            json.dump(commodity, f2, ensure_ascii=False, indent=4)
-        messagebox.showinfo('提示', '导入成功')
+                a[-6] += ('0' * (19 - len(a[-6])))
+
+                commodity[a[1]] = [a[4], a[-1], a[-6], eval(a[-5])]
+    with open(COMMODITY_CODE_JS, 'w', encoding='utf-8') as f2:
+        json.dump(commodity, f2, ensure_ascii=False, indent=4)
+    messagebox.showinfo('提示', '导入成功')
 
 
 def load_link():
@@ -125,9 +124,12 @@ def invoice(files):
             err_df.to_excel(file.replace('.xls', '(无).xls'), encoding='utf-8', index=False)
             df.to_excel(file.replace('.xls', '(发票).xls'), encoding='utf-8', index=False)
             messagebox.showinfo('提示', file + '  发票清单成功')
+
         except Exception as e:
 
             messagebox.showerror(e, file + '  发票清单错误')
+        else:
+            os.startfile(file.replace('.xls', '(无).xls'))
 
 
 def get_s(num, price, t):

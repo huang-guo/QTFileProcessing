@@ -1,7 +1,10 @@
 import json
 
 with open('config.json', encoding='utf-8')as f:
-    config = json.load(f)
+    contents = f.read()
+if contents.startswith(u'\ufeff'):
+    contents = contents.encode('utf8')[3:].decode('utf8')
+config = json.loads(contents)
 
 COMMODITY_CODE_JS = config['commodity_code_js']
 LINK_JS = config["link_js"]
