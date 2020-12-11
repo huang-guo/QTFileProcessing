@@ -5,7 +5,8 @@ with open('config.json', encoding='utf-8')as f:
 if contents.startswith(u'\ufeff'):
     contents = contents.encode('utf8')[3:].decode('utf8')
 config = json.loads(contents)
-
+TITLE = config['title']
+FORM_SIZE = config['form_size']
 COMMODITY_CODE_JS = config['commodity_code_js']
 LINK_JS = config["link_js"]
 

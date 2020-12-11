@@ -1,4 +1,6 @@
 {
+  "title": "前途专供",
+  "form_size": "500x500",
   "commodity_code_js": "./commodity.json",
   "link_js": "./link.json",
   "sample_invoice": "增值税发票税控开票软件清单信息数据接口规范样例.xls",

@@ -11,37 +11,6 @@ def load_data():
         filetypes=[('文本', '.txt')],
     )
     commodity = {}
-    if file_name:
-        with open(file_name)as file:
-            for line in file.readlines()[3:]:
-                line = line.replace('\n', '')
-                line = line.replace('否', '0').replace('是', '1')
-                a = line.split(',')
-                a[-6] += ('0' * (19 - len(a[-6])))
-
-                commodity[a[1]] = [a[4], a[-1], a[-6], eval(a[-5])]
-    with open(COMMODITY_CODE_JS, 'w', encoding='utf-8') as f2:
-        json.dump(commodity, f2, ensure_ascii=False, indent=4)
-    messagebox.showinfo('提示', '导入成功')
-
-
-def load_link():
-    file_name = askopenfilename(
-        filetypes=[(FIELD_LINK, EXCEL_SUFFIX)],
-    )
-
-    if file_name:
-        df = get_df(file_name)
-        links = df[FIELD_LINK]
-        names = df[FIELD_COMMODITY] + df[FIELD_PRICE].astype(str)
-        names_d = dict(zip(names, links))
-        if os.access('./link.json', os.F_OK):
-            old_links = load_link_json()
-            old_links.update(names_d)
-            names_d = old_links
-        with open(LINK_JS, 'w', encoding='utf-8') as file:
-            json.dump(names_d, file, ensure_ascii=False, indent=4)
-        messagebox.showinfo('提示', '导入成功')
 
 
 def summary(files):
@@ -78,6 +47,7 @@ def add_link(files):
             df[FIELD_LINK] = link
             df.to_excel(file.replace('.xls', '(链接).xls'), index=False)
             messagebox.showinfo('提示', file + '添加链接成功')
+            os.startfile(file.replace('.xls', '(链接).xls'))
         except Exception as e:
             messagebox.showerror(e, file + '添加链接失败')
 
@@ -153,4 +123,5 @@ def get_df(file):
     df.columns = df.iloc[0]
     df = df[df[FIELD_COMMODITY] != FIELD_COMMODITY]
     df.index = range(1, len(df) + 1)
+    df[FIELD_MONEY] = df[FIELD_PRICE] * df[FIELD_NUM]
     return df
