@@ -1,11 +1,7 @@
-# This is a sample Python script.
-from frame import MyTk
+import database
+from component.myForm import MyForm
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    root = MyTk()
+    database.create_all()
+    root = MyForm()
     root.mainloop()

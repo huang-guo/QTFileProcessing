@@ -1,9 +1,10 @@
 /dist/
 /build/
 /venv/
-commodity.json
-link.json
 *.spec
 *.exe
 /增值税发票税控开票软件清单信息数据接口规范样例.xls
 /test/
+*.db
+*.json
+*.xls
