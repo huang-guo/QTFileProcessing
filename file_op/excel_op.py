@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from pandas import DataFrame
 
-from database import links
+from database import links, tax
 from file_op.json_op import load_json_from_file
 from settings import FIELD_NUM, FIELD_PRICE, FIELD_UNIT, FIELD_COMMODITY, FIELD_NUMBER, FIELD_MONEY, FIELD_LINK
 
@@ -48,6 +48,15 @@ def get_links(file_name):
             links.update_from_id(query[0][0], loc[FIELD_LINK])
 
 
+def load_commodity_data_to_db(file):
+    if not file:
+        return
+    df = get_df(file, [FIELD_COMMODITY, '简名', '税收分类编码', '税率'])
+    for i in df.index:
+        loc = df.loc[i]
+        tax.insert(loc[FIELD_COMMODITY], loc['简名'], loc['税收分类编码'], loc['税率'])
+
+
 def add_links(file_name):
     if not file_name:
         return
@@ -77,6 +86,7 @@ def add_links(file_name):
     new_path = file_name[:-5] + file_name[-5:].replace('.', '(链接).')
     none_path = file_name[:-5] + file_name[-5:].replace('.', '(无).')
     DataFrame(new).to_excel(new_path, encoding='utf-8', index=False)
+    df[FIELD_LINK] = None
     df.loc[none].to_excel(none_path, encoding='utf-8', index=False)
     os.startfile(none_path)
 
@@ -85,7 +95,7 @@ def generator_invoice(file_name):
     if not file_name:
         return
     k = 1
-    commodity_data = load_json_from_file('./src/tax.json')
+    commodity_data = []
     df = get_df(file_name, [FIELD_NUM, FIELD_COMMODITY, FIELD_UNIT, FIELD_PRICE])
     mode_df = pd.read_excel('./src/model.xls')
     err = []
@@ -95,10 +105,25 @@ def generator_invoice(file_name):
         name = getattr(row, FIELD_COMMODITY)
         unit = getattr(row, FIELD_UNIT)
         price = getattr(row, FIELD_PRICE)
+        query = tax.query_from_name(name)
         if num <= 0:
             err.append(k)
             continue
+        if query:
+            line = [
+                k, query[0][0], unit, None, num,
+                num * price, query[0][2], None, None,
+                get_amount_tax(num, price, query[0][2]),
+                None, None, price, 1, 36.0,
+                query[0][1], None, 0, None, None, 0
+            ]
+            mode_df.loc[k] = line
+            k += 1
+            continue
+
         length = 0
+        if not commodity_data:
+            commodity_data = load_json_from_file('./src/tax.json')
         for word in commodity_data.keys():
             if word == name:
                 best = word
@@ -108,6 +133,7 @@ def generator_invoice(file_name):
                 length = len(word)
                 best = word
         if length != 0:
+            tax.insert(name, best, commodity_data[best][2], commodity_data[best][0])
             line = [
                 k, best, unit, None, num,
                 num * price, commodity_data[best][0], None, None,
@@ -125,6 +151,7 @@ def generator_invoice(file_name):
     )
 
     err_df = pd.DataFrame(df.loc[err])
+    err_df[['简名', '税收分类编码', '税率']] = None
     path = file_name[:-5] + file_name[-5:].replace('.', '(无).')
     err_df.to_excel(path, encoding='utf-8', index=False)
     os.startfile(path)

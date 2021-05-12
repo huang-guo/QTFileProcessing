@@ -1,7 +1,7 @@
-from .links import create
-
-__all__ = ['create_all']
+from .links import create as c1
+from .tax import create as c2
 
 
 def create_all():
-    create()
+    c1()
+    c2()
