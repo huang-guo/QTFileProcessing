@@ -84,11 +84,12 @@ def add_links(file_name):
         if not found:
             none.append(i)
     new_path = file_name[:-5] + file_name[-5:].replace('.', '(链接).')
-    none_path = file_name[:-5] + file_name[-5:].replace('.', '(无).')
     DataFrame(new).to_excel(new_path, encoding='utf-8', index=False)
-    df[FIELD_LINK] = None
-    df.loc[none].to_excel(none_path, encoding='utf-8', index=False)
-    os.startfile(none_path)
+    if none:
+        none_path = file_name[:-5] + file_name[-5:].replace('.', '(无).')
+        df[FIELD_LINK] = None
+        df.loc[none].to_excel(none_path, encoding='utf-8', index=False)
+        os.startfile(none_path)
 
 
 def generator_invoice(file_name):
@@ -149,12 +150,12 @@ def generator_invoice(file_name):
         file_name[:-5] + file_name[-5:].replace('.', '(发票).'),
         encoding='utf-8', index=False
     )
-
-    err_df = pd.DataFrame(df.loc[err])
-    err_df[['简名', '税收分类编码', '税率']] = None
-    path = file_name[:-5] + file_name[-5:].replace('.', '(无).')
-    err_df.to_excel(path, encoding='utf-8', index=False)
-    os.startfile(path)
+    if err:
+        err_df = pd.DataFrame(df.loc[err])
+        err_df[['简名', '税收分类编码', '税率']] = None
+        path = file_name[:-5] + file_name[-5:].replace('.', '(无).')
+        err_df.to_excel(path, encoding='utf-8', index=False)
+        os.startfile(path)
 
 
 def get_amount_tax(num, price, t):
