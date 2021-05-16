@@ -102,6 +102,8 @@ def add_links(file_name):
 
 
 def generator_invoice(file_name):
+    version_code = Config('INVOICE').get('version_code')
+    price_method = Config('INVOICE').get('price_method')
     if not file_name:
         return
     k = 1
@@ -124,7 +126,7 @@ def generator_invoice(file_name):
                 k, query[0][0], unit, None, num,
                 num * price, query[0][2], None, None,
                 get_amount_tax(num, price, query[0][2]),
-                None, None, price, 1, 36.0,
+                None, None, price, 1, version_code,
                 query[0][1], None, 0, None, None, 0
             ]
             mode_df.loc[k] = line
@@ -148,7 +150,7 @@ def generator_invoice(file_name):
                 k, best, unit, None, num,
                 num * price, commodity_data[best][0], None, None,
                 get_amount_tax(num, price, commodity_data[best][0]),
-                None, None, price, 1, commodity_data[best][1],
+                None, None, price, price_method, commodity_data[best][1],
                 commodity_data[best][2], None, commodity_data[best][3], None, None, 0
             ]
             mode_df.loc[k] = line

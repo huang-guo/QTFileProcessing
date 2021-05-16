@@ -39,5 +39,3 @@ def load_json_from_file(file_name):
             return {}
     else:
         return {}
-
-
