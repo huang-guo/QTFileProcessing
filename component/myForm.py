@@ -18,7 +18,7 @@ class MyForm(tkinter.Tk):
         self.menu.add_command(label="加载商品数据（excel)",
                               command=self.load_commodity_from_excel)
         self.menu.add_command(label="加载链接数据",
-                              command=lambda: get_links(askopenfilename(filetypes=[('excel', EXCEL_SUFFIX)], )))
+                              command=self.load_link_from_excel)
         self.config(menu=self.menu)
         self.file_select_box = FileSelectBox(self)
         self.file_select_box.pack()
@@ -39,7 +39,7 @@ class MyForm(tkinter.Tk):
             for file in files:
                 try:
                     load_commodity_data_to_db(file)
-
+                    messagebox.showinfo('提示', '导入成功')
                 except Exception as e:
                     messagebox.showerror('错误', file + '\n' + str(e))
 
@@ -49,6 +49,7 @@ class MyForm(tkinter.Tk):
         if file:
             try:
                 load_commodity_data(file)
+                messagebox.showinfo('提示', '导入成功')
             except Exception as e:
                 messagebox.showerror('错误', str(e))
 
