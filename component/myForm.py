@@ -1,3 +1,4 @@
+import os
 import tkinter
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename, askopenfilenames
@@ -21,6 +22,8 @@ class MyForm(tkinter.Tk):
                               command=self.load_commodity_from_excel)
         self.menu.add_command(label="加载链接数据",
                               command=self.load_link_from_excel)
+        self.menu.add_command(label="修改设置",
+                              command=lambda: os.startfile((os.path.join(os.getcwd(), 'app.ini'))))
         self.config(menu=self.menu)
         self.file_select_box = FileSelectBox(self)
         self.file_select_box.pack()
