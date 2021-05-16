@@ -1,15 +1,21 @@
 import configparser
 
-conf = configparser.ConfigParser()
-conf.read('./app.ini', encoding="utf-8")
 
-TITLE = conf.get('FORM', 'title')
-FORM_SIZE = conf.get('FORM', 'size')
-FIELD_LINK = conf.get('FIELD', 'link')
-FIELD_COMMODITY = conf.get('FIELD', 'commodity')
-FIELD_PRICE = conf.get('FIELD', 'price')
-FIELD_UNIT = conf.get('FIELD', 'unit')
-FIELD_NUM = conf.get('FIELD', 'count')
-FIELD_MONEY = conf.get('FIELD', 'money')
-FIELD_NUMBER = conf.get('FIELD', 'index')
-EXCEL_SUFFIX = conf.get('SUFFIX', 'excel').split(',')
+class Config:
+    _conf = configparser.ConfigParser()
+    _conf.read('./app.ini', encoding="utf-8")
+
+    def __init__(self, section):
+        self.section = section
+
+    def get(self, key):
+        return self._conf.get(self.section, key)
+
+    def set(self, key, value):
+        self._conf.set(self.section, key, value)
+        with open("./app.ini", "w+") as f:
+            self._conf.write(f)
+
+    @classmethod
+    def reload(cls):
+        cls._conf.read('./app.ini', encoding="utf-8")

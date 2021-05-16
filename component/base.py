@@ -1,10 +1,7 @@
 import tkinter as tk
 from tkinter import MULTIPLE, ACTIVE, END, messagebox
-from tkinter.filedialog import askopenfilenames, askopenfilename
+from tkinter.filedialog import askopenfilenames
 import file_op
-from file_op.excel_op import get_links
-from file_op.json_op import load_commodity_data
-from settings import EXCEL_SUFFIX
 
 
 class FileSelectBox(tk.Frame):
@@ -20,7 +17,7 @@ class FileSelectBox(tk.Frame):
 
     def add_files(self):
         files = askopenfilenames(
-            filetypes=[('excel', EXCEL_SUFFIX)],
+            filetypes=[('excel', ['.xls', '.xlsx'])],
         )
         if files:
             self.add_files_to_list(files)

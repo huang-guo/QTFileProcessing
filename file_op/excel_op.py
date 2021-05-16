@@ -5,7 +5,16 @@ from pandas import DataFrame
 
 from database import links, tax
 from file_op.json_op import load_json_from_file
-from settings import FIELD_NUM, FIELD_PRICE, FIELD_UNIT, FIELD_COMMODITY, FIELD_NUMBER, FIELD_MONEY, FIELD_LINK
+from settings import Config
+
+config = Config('FIELD')
+FIELD_NUM = config.get('count')
+FIELD_PRICE = config.get('price')
+FIELD_UNIT = config.get('unit')
+FIELD_COMMODITY = config.get('commodity')
+FIELD_NUMBER = config.get('index')
+FIELD_MONEY = config.get('money')
+FIELD_LINK = config.get('link')
 
 
 def get_df(file, fields):
