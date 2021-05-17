@@ -3,7 +3,7 @@ import configparser
 
 class Config:
     _conf = configparser.ConfigParser()
-    _conf.read('./app.ini', encoding="utf-8")
+    _conf.read('./app.ini', encoding="gbk")
 
     def __init__(self, section):
         self.section = section
@@ -18,4 +18,4 @@ class Config:
 
     @classmethod
     def reload(cls):
-        cls._conf.read('./app.ini', encoding="utf-8")
+        cls._conf.read('./app.ini', encoding="gbk")
