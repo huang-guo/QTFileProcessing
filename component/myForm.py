@@ -37,7 +37,7 @@ class MyForm(tkinter.Tk):
         self.title(self._setting.get('title'))
 
     def refresh(self):
-        self._setting.reload()
+        Config.reload()
         self.load_config()
 
     @staticmethod
