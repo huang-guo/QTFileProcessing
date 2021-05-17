@@ -1,6 +1,10 @@
 import json
 import os
 
+from settings import Config
+
+invoice_settings = Config('INVOICE')
+
 
 def load_commodity_data(file_name):
     if not file_name:
@@ -14,6 +18,8 @@ def load_commodity_data(file_name):
             a[-6] += ('0' * (19 - len(a[-6])))
 
             commodity[a[1]] = [a[4], a[-1], a[-6], eval(a[-5])]
+    if a[-1] != invoice_settings.get('version_code'):
+        invoice_settings.set('version_code', a[-1])
     dump_json_to_file('./src/tax.json', commodity)
 
 
