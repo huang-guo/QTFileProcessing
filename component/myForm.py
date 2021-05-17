@@ -24,6 +24,8 @@ class MyForm(tkinter.Tk):
                               command=self.load_link_from_excel)
         self.menu.add_command(label="修改设置",
                               command=lambda: os.startfile((os.path.join(os.getcwd(), 'app.ini'))))
+        self.menu.add_command(label="刷新",
+                              command=self.refresh)
         self.config(menu=self.menu)
         self.file_select_box = FileSelectBox(self)
         self.file_select_box.pack()
@@ -33,6 +35,10 @@ class MyForm(tkinter.Tk):
     def load_config(self):
         self.geometry(self._setting.get('size'))
         self.title(self._setting.get('title'))
+
+    def refresh(self):
+        self._setting.reload()
+        self.load_config()
 
     @staticmethod
     def load_commodity_from_excel():
