@@ -36,7 +36,7 @@ def summary(file_name):
             [FIELD_COMMODITY, FIELD_UNIT, FIELD_PRICE],
             as_index=False
         )[FIELD_NUM].sum())
-    df = df[df[FIELD_NUM].astype(float) > 0]
+    df = df[df[FIELD_NUM].astype(float) != 0]
     df[FIELD_MONEY] = df[FIELD_NUM] * df[FIELD_PRICE]
     df.insert(0, FIELD_NUMBER, range(1, len(df) + 1), )
     path = file_name[:-5] + file_name[-5:].replace('.', '(汇总).')
