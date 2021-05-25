@@ -18,6 +18,7 @@ def create():
 
 def insert(commodity, name, code, tax_rate):
     cursor = conn.cursor()
+    code = str(code).ljust(19, '0')
     sql = f"replace INTO tax (commodity, name, code, tax_rate)VALUES ('{commodity}', '{name}','{code}', {tax_rate});"
     cursor.execute(sql)
     cursor.close()
@@ -31,5 +32,3 @@ def query_from_name(commodity):
     values = cursor.fetchall()
     cursor.close()
     return values
-
-
