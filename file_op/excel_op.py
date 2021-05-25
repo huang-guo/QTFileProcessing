@@ -120,6 +120,7 @@ def generator_invoice(file_name):
         query = tax.query_from_name(name)
         if num <= 0:
             err.append(k)
+            k += 1
             continue
         if query:
             line = [
