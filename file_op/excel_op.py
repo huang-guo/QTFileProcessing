@@ -60,10 +60,10 @@ def get_links(file_name):
 def load_commodity_data_to_db(file):
     if not file:
         return
-    df = get_df(file, [FIELD_COMMODITY, '简名', '税收分类编码', '税率'])
+    df = get_df(file, [FIELD_COMMODITY, '简名', '税收分类编码'])
     for i in df.index:
         loc = df.loc[i]
-        tax.insert(loc[FIELD_COMMODITY], loc['简名'], loc['税收分类编码'], loc['税率'])
+        tax.insert(loc[FIELD_COMMODITY], loc['简名'], str(loc['税收分类编码']))
 
 
 def add_links(file_name):
@@ -112,11 +112,14 @@ def generator_invoice(file_name):
     mode_df = pd.read_excel('./src/model.xls')
     err = []
     best = None
+    tax_rate = Config('INVOICE').get('tax_rate')
+
     for row in df.itertuples():
         num = getattr(row, FIELD_NUM)
         name = getattr(row, FIELD_COMMODITY)
         unit = getattr(row, FIELD_UNIT)
         price = getattr(row, FIELD_PRICE)
+
         query = tax.query_from_name(name)
         if num <= 0:
             err.append(k)
@@ -125,8 +128,8 @@ def generator_invoice(file_name):
         if query:
             line = [
                 k, query[0][0], unit, None, num,
-                num * price, query[0][2], None, None,
-                get_amount_tax(num, price, query[0][2]),
+                num * price, tax_rate, None, None,
+                get_amount_tax(num, price, tax_rate),
                 None, None, price, 1, version_code,
                 query[0][1], None, 0, None, None, 0
             ]
@@ -146,11 +149,11 @@ def generator_invoice(file_name):
                 length = len(word)
                 best = word
         if length != 0:
-            tax.insert(name, best, commodity_data[best][2], commodity_data[best][0])
+            tax.insert(name, best, commodity_data[best][2])
             line = [
                 k, best, unit, None, num,
                 num * price, commodity_data[best][0], None, None,
-                get_amount_tax(num, price, commodity_data[best][0]),
+                get_amount_tax(num, price, tax_rate),
                 None, None, price, price_method, commodity_data[best][1],
                 commodity_data[best][2], None, commodity_data[best][3], None, None, 0
             ]
@@ -164,7 +167,7 @@ def generator_invoice(file_name):
     )
     if err:
         err_df = pd.DataFrame(df.loc[err])
-        err_df[['简名', '税收分类编码', '税率']] = None
+        err_df[['简名', '税收分类编码']] = None
         path = file_name[:-5] + file_name[-5:].replace('.', '(无).')
         err_df.to_excel(path, encoding='utf-8', index=False)
         os.startfile(path)

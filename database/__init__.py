@@ -1,7 +1,15 @@
-from .links import create as c1
-from .tax import create as c2
+
+from .connector import Link, Tax
+import sqlite3
+
+conn = sqlite3.connect("./src/data.db")
+links = Link(conn)
+tax = Tax(conn)
 
 
 def create_all():
-    c1()
-    c2()
+    links.create()
+    tax.create()
+
+
+__all__ = [links, tax]
